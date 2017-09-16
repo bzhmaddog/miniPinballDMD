@@ -1,1 +1,9 @@
 .idea
+*.iml
+.gradle
+/local.properties
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+app/src/main/assets/node_modules
