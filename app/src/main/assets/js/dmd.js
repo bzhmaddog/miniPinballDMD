@@ -1,13 +1,13 @@
-var DMD = function (oWidth, oHeight, cWidth, cHeight, pixelWidth, pixelHeight, xSpace, ySpace, pixelShape, el) {
+var DMD = function (oWidth, oHeight, cWidth, cHeight, pixelWidth, pixelHeight, xSpace, ySpace, pixelShape, canvas) {
 
-	var canvas = el,
-		context = canvas.getContext('2d'),
+	var context = canvas.getContext('2d'),
 		xSpace = xSpace,
 		ySpace = xSpace,
 		pixelWidth = pixelWidth,
 		pixelHeight = pixelHeight,
 		pixelShape = pixelShape,
 		layers = {},
+		nbLayers = 0,
 		width = oWidth,
 		height = oHeight,
 		dmdBuffer = new DMD.Buffer(cWidth, cHeight),
@@ -69,11 +69,13 @@ var DMD = function (oWidth, oHeight, cWidth, cHeight, pixelWidth, pixelHeight, x
 	function addLayer(name, type, src, mimeType, transparent, visible, extra) {
 		var layer = new DMD.Layer(name, type, width, height, src, mimeType, transparent, visible, extra);
 		layers[name] = layer;
+		nbLayers++;
 	}
 
 	function removeLayer(name) {
 		if (typeof layers[name] !== 'undefined') {
 			delete layers[name];
+			nbLayers--;
 		}
 	}
 
@@ -91,7 +93,7 @@ var DMD = function (oWidth, oHeight, cWidth, cHeight, pixelWidth, pixelHeight, x
 	}
 
 	function renderDMD() {
-		//console.log(layers);
+
 		for (var name in layers) {
 			if (layers.hasOwnProperty(name)) {
 				var layer = layers[name];
@@ -106,45 +108,63 @@ var DMD = function (oWidth, oHeight, cWidth, cHeight, pixelWidth, pixelHeight, x
 
 					frameBuffer.context.drawImage(layer.content, 0, 0, frameBuffer.width, frameBuffer.height);
 					
-					var frameImageData = frameBuffer.context.getImageData(0, 0,frameBuffer.width, frameBuffer.height);
-					var frameData = frameImageData.data;
-					
-					var x = 1;
-					var y = 1;
-		
-					for (var i = 0 ; i < frameBuffer.width * frameBuffer.height *4 ; i+=4) { // each pixel use 4 bytes (RGBA)
-						// get the pixel from the current frame
-						var r = frameData[i];
-						var g = frameData[i+1];
-						var b = frameData[i+2];
-						var a = frameData[i+3];
-						
-						//console.log(a);
-
-						//r = 255;
-						//g = 255;
-						//b = 255;
-
-						drawPixel(x, y, dmdData, r, g, b, a);
-
-						x++;
-						if (x > frameBuffer.width) {
-							x = 1;
-							y++;
-						}
-					}
-					
-					dmdImageData.data = dmdData;
-					
-					// put the altered data back into the canvas context
-					context.putImageData(dmdImageData, 0, 0);				
-					
 				}
 			}
 		}
+		
+		var frameImageData = frameBuffer.context.getImageData(0, 0,frameBuffer.width, frameBuffer.height);
+		var frameData = frameImageData.data;
+		
+		var x = 1;
+		var y = 1;
+
+		for (var i = 0 ; i < frameBuffer.width * frameBuffer.height *4 ; i+=4) { // each pixel use 4 bytes (RGBA)
+			// get the pixel from the current frame
+			var r = frameData[i];
+			var g = frameData[i+1];
+			var b = frameData[i+2];
+			var a = frameData[i+3];
+			
+			//console.log(a);
+
+			//r = 255;
+			//g = 255;
+			//b = 255;
+
+			drawPixel(x, y, dmdData, r, g, b, a);
+
+			x++;
+			if (x > frameBuffer.width) {
+				x = 1;
+				y++;
+			}
+		}
+		
+		dmdImageData.data = dmdData;
+		
+		// put the altered data back into the canvas context
+		context.putImageData(dmdImageData, 0, 0);		
+		
+		requestAnimationFrame(renderDMD);
+	}
+	
+	function waitForLayer() {
+		if (nbLayers > 0) {
+			renderDMD();
+			return;
+		}
+		console.log('wait for layer');
+		requestAnimationFrame(waitForLayer);
 	}
 
-	setInterval(renderDMD, 20);
+	console.log(nbLayers);
+	
+	if (nbLayers === 0) {
+		waitForLayer();
+	} else {
+		renderDMD();
+	}
+	//setInterval(renderDMD, 20);
 	//setTimeout(renderDMD,1000);
 	
 	return {

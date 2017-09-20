@@ -16,19 +16,16 @@ var app = {
 		dmd.addLayer('background', 'image', 'img/dmd-160x96-empty.png' , 'image/png', false, true);
 		
 		
-		//dmd.addLayer('background', 'image', 'img/dmd-80x50-empty.png' , 'image/png', false, true);
+//		dmd.addLayer('city', 'image', 'img/city-bg.png' , 'image/png', false, true);
 		
-		dmd.addLayer('background', 'image', 'img/tmnt-title.png' , 'image/png', true, true);
-		//dmd.addLayer('background', 'image', 'img/tmnt-test-160x96-orange.png' , 'image/png', true, true);
-		//dmd.addLayer('background', 'image', 'img/tmnt-test2.png' , 'image/png', true, true);
+//		dmd.addLayer('title', 'image', 'img/title.png' , 'image/png', true, true);
 
 		
 		
-		
-		/*dmd.addLayer('mainVideo', 'video', 'anim/scott_idle_128x64.mp4', 'video/mp4', false, true, {
+		dmd.addLayer('mainVideo', 'video', 'anim/extra-ball.webm', 'video/webm', true, true, {
 			autoplay : true,
-			loop : false
-		});*/
+			loop : true
+		});
   		
 		
 		//console.log(window.innerWidth + 'x' + window.innerHeight);
